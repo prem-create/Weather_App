@@ -1,19 +1,20 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:weather_app/weather_model/weather_model.dart';
+import 'package:weather_app/model/weather_model.dart';
 
-class WeatherApiServices {
+class WeatherApiService {
   final double lon;
   final double lat;
-  final apiKey="Your_Api_Key";
+  final apiKey="Your api key";
 
-  WeatherApiServices({required this.lon, required this.lat});
+  WeatherApiService({required this.lon, required this.lat});
 
   Future<WeatherModel> getWeather() async {
     final response = await http.get(
       Uri.https("api.openweathermap.org", "/data/2.5/weather", {
         "lon": lon.toString(),
         "lat": lat.toString(),
+        "units":"metric",
         "appid": apiKey,
       }),
     );
@@ -24,8 +25,8 @@ class WeatherApiServices {
       } else {
         throw Exception("Error occured, StatusCode: ${response.body}");
       }
-    } catch (e) {
-      throw ("error:$e");
+    } catch (error) {
+      throw ("error: $error");
     }
   }
 }
