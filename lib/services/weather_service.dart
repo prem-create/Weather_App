@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:weather_app/constants/constants.dart';
 import 'package:weather_app/model/weather_model.dart';
 
 class WeatherApiService {
   final double lon;
   final double lat;
-  final apiKey="Your api key";
 
   WeatherApiService({required this.lon, required this.lat});
 

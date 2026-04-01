@@ -4,8 +4,9 @@ import 'package:lottie/lottie.dart';
 import 'package:weather_app/services/weather_service.dart';
 import 'package:weather_app/utils/get_current_location.dart';
 import 'package:weather_app/utils/animation_picker.dart';
-import 'package:weather_app/utils/loading.dart';
+import 'package:weather_app/widgets/loading.dart';
 import 'package:weather_app/model/weather_model.dart';
+import 'package:weather_app/widgets/my_alert_dialog.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
@@ -49,37 +50,69 @@ class _WeatherPageState extends State<WeatherPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      floatingActionButton: _isLoading
+          ? null
+          : FloatingActionButton(
+              onPressed: () async {
+                final result = await showModalBottomSheet(
+                  isScrollControlled: true,
+                  showDragHandle: true,
+                  context: context,
+                  builder: (context) => MyAlertDialog(),
+                );
+
+                if (result != null) {
+                  weatherModel = result;
+                  setState(() {
+                    _isLoading = false;
+                  });
+                }else{
+                  setState(() {
+                  _isLoading = true;
+                });
+                }
+              },
+
+              child: Icon(Icons.search),
+            ),
       body: Center(
         child: _isLoading
             ? Center(child: loading(size))
             : error != null
             ? Text(error!)
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Lottie.asset(animationPicker(weatherModel.mainCondition)),
-                  Text(
-                    weatherModel.weatherDescription,
-                    style: TextStyle(
-                      fontSize: 0.1 * size.width,
-                      fontWeight: FontWeight.bold,
+            : SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Lottie.asset(animationPicker(weatherModel.mainCondition)),
+                    FittedBox(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Text(
+                          weatherModel.weatherDescription,
+                          style: TextStyle(
+                            fontSize: 0.1 * size.width,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  Text(
-                    "Temperature ♨: ${weatherModel.temperature.toString()}℃",
-                    style: TextStyle(
-                      fontSize: 0.05 * size.width,
-                      fontWeight: FontWeight.w500,
+                    Text(
+                      "Temperature ♨: ${weatherModel.temperature.toString()}℃",
+                      style: TextStyle(
+                        fontSize: 0.05 * size.width,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  Text(
-                    "Location 🌏: ${weatherModel.cityName}, ${weatherModel.country}",
-                    style: TextStyle(
-                      fontSize: 0.05 * size.width,
-                      fontWeight: FontWeight.w500,
+                    Text(
+                      "Location 🌏: ${weatherModel.cityName}, ${weatherModel.country}",
+                      style: TextStyle(
+                        fontSize: 0.05 * size.width,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
       ),
     );
